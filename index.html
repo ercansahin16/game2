@@ -907,25 +907,13 @@ body { padding:8px; }
 }
 
  
-</style>
- <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-const _0xA1="AIzaSyCloL8IN0NpHQBxFjaRH_62vOEWjLQjr4o";
-const _0xB2="duapro-a7d7e.firebaseapp.com";
-const _0xC3="duapro-a7d7e";
-
-const app = initializeApp({
-  apiKey:_0xA1,
-  authDomain:_0xB2,
-  projectId:_0xC3
-});
-
-const db = getFirestore(app);
+<script>
+ import { collection, query, where, getDocs, updateDoc } 
+from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 // Rastgele cihaz ID üret
-function _dID(){
+function getDeviceId(){
   let id = localStorage.getItem("deviceId");
   if(!id){
     id = crypto.randomUUID();
@@ -934,20 +922,20 @@ function _dID(){
   return id;
 }
 
-async function _vKey(k){
-  const q = query(collection(db,"licenses"), where("key","==",k));
-  const s = await getDocs(q);
+async function verifyLicense(key){
+  const q = query(collection(db,"licenses"), where("key","==",key));
+  const snapshot = await getDocs(q);
 
-  if(s.empty){
+  if(snapshot.empty){
     alert("Geçersiz lisans!");
     return false;
   }
 
-  const docRef = s.docs[0];
+  const docRef = snapshot.docs[0];
   const data = docRef.data();
-  const currentDevice = _dID();
+  const currentDevice = getDeviceId();
 
-  // Eğer daha önce cihaz bağlanmamışsa bağla
+  // İlk kullanım
   if(!data.deviceId){
     await updateDoc(docRef.ref,{
       deviceId: currentDevice,
@@ -956,7 +944,7 @@ async function _vKey(k){
     return true;
   }
 
-  // Eğer aynı cihazsa izin ver
+  // Aynı cihazsa izin ver
   if(data.deviceId === currentDevice){
     return true;
   }
@@ -966,33 +954,30 @@ async function _vKey(k){
 }
 
 window.onLicenseSubmit = async () => {
-  const k = document.getElementById("licenseInput").value.trim();
-  if(!k){ alert("Anahtar girin"); return; }
+  const key = document.getElementById("licenseInput").value.trim();
+  if(!key){
+    alert("Anahtar girin");
+    return;
+  }
 
-  const ok = await _vKey(k);
+  const ok = await verifyLicense(key);
   if(ok){
-    localStorage.setItem("nevafilKey",k);
-    _start();
+    localStorage.setItem("nevafilKey", key);
+    document.getElementById("licensePrompt").style.display="none";
   }
-}
+};
 
-function _start(){
-  document.getElementById("licensePrompt").style.display="none";
-  const iframe=document.createElement("iframe");
-  iframe.src="https://ercansahin16.github.io/game1/";
-  iframe.style.width="100%";
-  iframe.style.height="100vh";
-  iframe.style.border="none";
-  document.body.appendChild(iframe);
-}
-
-window.onload=async()=>{
-  const saved=localStorage.getItem("nevafilKey");
+window.addEventListener("load", async ()=>{
+  const saved = localStorage.getItem("nevafilKey");
   if(saved){
-    const ok=await _vKey(saved);
-    if(ok){ _start(); return; }
+    const ok = await verifyLicense(saved);
+    if(ok){
+      document.getElementById("licensePrompt").style.display="none";
+    }
+  } else {
+    document.getElementById("licensePrompt").style.display="flex";
   }
-}
+});
 </script>
 </head>
 <body>
@@ -2618,3 +2603,4 @@ window.addEventListener('beforeunload', () => { saveScoreToLeaderboard(); });
 </body>
 
 </html>
+
