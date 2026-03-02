@@ -864,9 +864,147 @@ body { padding:8px; }
 .mascot { width:60px; bottom:10px; left:10px; }
 .sound-toggle { width:45px; height:45px; font-size:1.3rem; bottom:10px; right:10px; }
 }
+
+
+
+ #licensePrompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.license-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  width: 350px;
+}
+
+#licenseInput {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.license-box button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #6c5ce7;
+  color: white;
+  cursor: pointer;
+}
+
+ 
 </style>
+ <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const _0xA1="AIzaSyCloL8IN0NpHQBxFjaRH_62vOEWjLQjr4o";
+const _0xB2="duapro-a7d7e.firebaseapp.com";
+const _0xC3="duapro-a7d7e";
+
+const app = initializeApp({
+  apiKey:_0xA1,
+  authDomain:_0xB2,
+  projectId:_0xC3
+});
+
+const db = getFirestore(app);
+
+// Rastgele cihaz ID üret
+function _dID(){
+  let id = localStorage.getItem("deviceId");
+  if(!id){
+    id = crypto.randomUUID();
+    localStorage.setItem("deviceId", id);
+  }
+  return id;
+}
+
+async function _vKey(k){
+  const q = query(collection(db,"licenses"), where("key","==",k));
+  const s = await getDocs(q);
+
+  if(s.empty){
+    alert("Geçersiz lisans!");
+    return false;
+  }
+
+  const docRef = s.docs[0];
+  const data = docRef.data();
+  const currentDevice = _dID();
+
+  // Eğer daha önce cihaz bağlanmamışsa bağla
+  if(!data.deviceId){
+    await updateDoc(docRef.ref,{
+      deviceId: currentDevice,
+      used: true
+    });
+    return true;
+  }
+
+  // Eğer aynı cihazsa izin ver
+  if(data.deviceId === currentDevice){
+    return true;
+  }
+
+  alert("Bu lisans başka cihazda kullanılıyor!");
+  return false;
+}
+
+window.onLicenseSubmit = async () => {
+  const k = document.getElementById("licenseInput").value.trim();
+  if(!k){ alert("Anahtar girin"); return; }
+
+  const ok = await _vKey(k);
+  if(ok){
+    localStorage.setItem("nevafilKey",k);
+    _start();
+  }
+}
+
+function _start(){
+  document.getElementById("licensePrompt").style.display="none";
+  const iframe=document.createElement("iframe");
+  iframe.src="https://ercansahin16.github.io/game1/";
+  iframe.style.width="100%";
+  iframe.style.height="100vh";
+  iframe.style.border="none";
+  document.body.appendChild(iframe);
+}
+
+window.onload=async()=>{
+  const saved=localStorage.getItem("nevafilKey");
+  if(saved){
+    const ok=await _vKey(saved);
+    if(ok){ _start(); return; }
+  }
+}
+</script>
 </head>
 <body>
+
+
+ <div id="licensePrompt" style="display:none;">
+  <div class="license-box">
+    <h2>Lisans Anahtarınızı Girin</h2>
+    <input type="text" id="licenseInput" placeholder="GAME-XXXXXX">
+    <button onclick="onLicenseSubmit()">Oyunu Başlat</button>
+  </div>
+</div>
 
 <!-- ========== INTRO EKRANI ========= -->
 <div id="introOverlay" class="intro-overlay">
@@ -2478,4 +2616,5 @@ window.addEventListener('beforeunload', () => { saveScoreToLeaderboard(); });
 });
 </script>
 </body>
+
 </html>
