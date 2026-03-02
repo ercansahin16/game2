@@ -865,46 +865,7 @@ body { padding:8px; }
 .sound-toggle { width:45px; height:45px; font-size:1.3rem; bottom:10px; right:10px; }
 }
 
-
-
- #licensePrompt {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.license-box {
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  text-align: center;
-  width: 350px;
-}
-
-#licenseInput {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.license-box button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #6c5ce7;
-  color: white;
-  cursor: pointer;
-}
+</style>
 
  
 
@@ -913,13 +874,6 @@ body { padding:8px; }
 <body>
 
 
- <div id="licensePrompt" >
-  <div class="license-box">
-    <h2>Lisans Anahtarınızı Girin</h2>
-    <input type="text" id="licenseInput" placeholder="GAME-XXXXXX">
-    <button onclick="onLicenseSubmit()">Oyunu Başlat</button>
-  </div>
-</div>
 
 <!-- ========== INTRO EKRANI ========= -->
 <div id="introOverlay" class="intro-overlay">
@@ -2530,80 +2484,12 @@ mascot.addEventListener('click', () => mascotSpeak('Soruyu cevaplamaya ne dersin
 window.addEventListener('beforeunload', () => { saveScoreToLeaderboard(); });
 });
 </script>
- <script>
- import { collection, query, where, getDocs, updateDoc } 
-from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-// Rastgele cihaz ID üret
-function getDeviceId(){
-  let id = localStorage.getItem("deviceId");
-  if(!id){
-    id = crypto.randomUUID();
-    localStorage.setItem("deviceId", id);
-  }
-  return id;
-}
-
-async function verifyLicense(key){
-  const q = query(collection(db,"licenses"), where("key","==",key));
-  const snapshot = await getDocs(q);
-
-  if(snapshot.empty){
-    alert("Geçersiz lisans!");
-    return false;
-  }
-
-  const docRef = snapshot.docs[0];
-  const data = docRef.data();
-  const currentDevice = getDeviceId();
-
-  // İlk kullanım
-  if(!data.deviceId){
-    await updateDoc(docRef.ref,{
-      deviceId: currentDevice,
-      used: true
-    });
-    return true;
-  }
-
-  // Aynı cihazsa izin ver
-  if(data.deviceId === currentDevice){
-    return true;
-  }
-
-  alert("Bu lisans başka cihazda kullanılıyor!");
-  return false;
-}
-
-window.onLicenseSubmit = async () => {
-  const key = document.getElementById("licenseInput").value.trim();
-  if(!key){
-    alert("Anahtar girin");
-    return;
-  }
-
-  const ok = await verifyLicense(key);
-  if(ok){
-    localStorage.setItem("nevafilKey", key);
-    document.getElementById("licensePrompt").style.display="none";
-  }
-};
-
-window.addEventListener("load", async ()=>{
-  const saved = localStorage.getItem("nevafilKey");
-  if(saved){
-    const ok = await verifyLicense(saved);
-    if(ok){
-      document.getElementById("licensePrompt").style.display="none";
-    }
-  } else {
-    document.getElementById("licensePrompt").style.display="flex";
-  }
-});
-</script>
+ 
 </body>
 
 </html>
+
 
 
 
