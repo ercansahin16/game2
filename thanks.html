@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teşekkürler | Nevafil Game</title>
+
+<style>
+  /* Genel Body */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  /* Container */
+  .thanks-container {
+    background: #1e1e1e;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  }
+
+  /* Başlık */
+  .thanks-container h1 {
+    margin-bottom: 15px;
+    font-size: 2em;
+    color: #6c5ce7;
+  }
+
+  /* Açıklama */
+  .thanks-container p {
+    font-size: 1em;
+    margin-bottom: 30px;
+    line-height: 1.4;
+    color: #ccc;
+  }
+
+  /* Buton */
+  .thanks-container button {
+    padding: 12px 25px;
+    font-size: 1em;
+    color: #ffffff;
+    background: #6c5ce7;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .thanks-container button:hover {
+    background: #5a4ddb;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .thanks-container {
+      padding: 25px;
+    }
+
+    .thanks-container h1 {
+      font-size: 1.6em;
+    }
+
+    .thanks-container p {
+      font-size: 0.95em;
+    }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="thanks-container">
+  <h1>🎉 Teşekkürler!</h1>
+  <p>Lisansınız doğrulandı ve oyun erişiminiz aktif. Artık Nevafil Game’i oynayabilirsiniz.</p>
+  <button onclick="startGame()">Oyunu Başlat</button>
+</div>
+
+<script>
+  function startGame() {
+    // Oyuna yönlendiriyoruz
+    window.location.href = "/game/index.html"; // veya direkt /game/index.html
+  }
+</script>
+
+</body>
+</html>
